@@ -215,7 +215,9 @@ void wipe() {
   }
 
   drawTo(WIPER_X - 20, WIPER_Y);
+  lift(1);
   drawTo(WIPER_X + 5, WIPER_Y);
+  drawTo(WIPER_X, WIPER_Y);
 }
 
 void rest() {
@@ -230,7 +232,7 @@ void colon() {
 
 void calibration_loop() {
   calculate_calibration_coordinates();
-  delay(1000);
+  delay(1000);  
   //  // Servohorns will have 90° between movements, parallel to x and y axis
   drawTo(3.7, 29.4);
   ////  lift(0);
@@ -258,6 +260,7 @@ void test_loop() {
 
 void dots() {
   lift(2);
+  
   for (double y = 45; y >= 20; y -= 5) {
     for (double x = 5; x <= 65; x += 5) {
       drawTo(x, y);
@@ -265,9 +268,8 @@ void dots() {
       lift(1);
     }
   }
-  lift(2);
-  drawTo(WIPER_X, WIPER_Y);
-  lift(1);
+  
+  rest();
 }
 
 void draw_time(int hour, int minute) {

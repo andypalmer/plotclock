@@ -323,6 +323,7 @@ void original_loop() {
 
 // Writing numeral with bx by being the bottom left originpoint. Scale 1 equals a 20 mm high font.
 // The structure follows this principle: move to first startpoint of the numeral, lift down, draw numeral, lift up
+// ANDY: the curve functions are called with doubles, but the method takes ints, so we're losing precision
 void number(float bx, float by, int num, float scale) {
 
   switch (num) {
@@ -432,7 +433,9 @@ void lift(char lift) {
 
 
 void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee) {
-  float inkr = -0.05;
+  // start = start angle, ende = end angle (from horizontal)
+  // sqee = 1 for everything except the 0... compresses the x direction to create an ellipse
+  float inkr = -0.05; // increment in radians
   float count = 0;
 
   do {

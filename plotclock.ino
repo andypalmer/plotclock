@@ -15,7 +15,6 @@
 //       - see http://www.pjrc.com/teensy/td_libs_DS1307RTC.html for how to hook up the real time clock
 
 // delete or mark the next line as comment if you don't need these
-//#define CALIBRATION      // enable calibration mode
 #define REALTIMECLOCK    // enable real time clock
 
 // When in calibration mode, adjust the following factor until the servos move exactly 90 degrees
@@ -131,11 +130,7 @@ void setup()
 }
 
 void loop() {
-#ifdef CALIBRATION
-  calibration_loop();
-#else
   test_loop();
-#endif
 }
 
 void setupMenu()
@@ -227,23 +222,6 @@ void rest() {
 void colon() {
   number(28, 25, 11, 0.9);
 }
-
-void calibration_loop() {
-  calculate_calibration_coordinates();
-  delay(1000);  
-  //  // Servohorns will have 90° between movements, parallel to x and y axis
-  drawTo(3.7, 29.4);
-  ////  lift(0);
-  delay(500);
-  drawTo(79.8, 33.6);
-  ////  lift(1);
-  delay(500);
-  //  drawTo(WIPER_X, WIPER_Y);
-  //  delay(2000);
-  ////  lift(2);
-  ////  delay(500);
-}
-
 
 void test_loop() {
   if (mySUI.checkForUser(150))
@@ -584,34 +562,4 @@ void calculate_angles(double x, double y) {
 
   servo2.writeMicroseconds(1450-541*theta1);
   servo3.writeMicroseconds(1250+636*theta5);
-}
-
-void calculate_calibration_coordinates() {
-  double p2x = O1X;
-  double p2y = O1Y + L1;
-  double p4x = O2X + L1;
-  double p4y = O1Y;
-  // distance between P2 and P4
-  double d = sqrt((p4x - p2x) * (p4x - p2x) + (p2y - p4y) * (p2y - p4y));
-  double a = d / 2;
-
-  // distance between P3 and bisecting line P2P4
-  double h = sqrt(L2 * L2 - a * a);
-
-  // location of Ph
-  double xh = p2x + a * (p4x - p2x) / d;
-  double yh = p2y + a * (p4y - p2y) / d;
-
-  // location of P3
-  double p3x = xh - h * (p4y - p2y) / d;
-  double p3y = yh + h * (p4x - p2x) / d;
-
-  // distance between P5 (right servo) and P3
-  double p53 = sqrt((p3x - O2X) * (p3x - O2X) + (p3y - O2Y) * (p3y - O2Y));
-  double theta = M_PI - (return_angle(L2, p53, L1) + 0.621);
-  // location of pen
-  double pen_x = p3x + L3 * cos(theta);
-  double pen_y = p3y + L3 * sin(theta);
-  //Serial.println(pen_x);
-  //Serial.println(pen_y);
 }

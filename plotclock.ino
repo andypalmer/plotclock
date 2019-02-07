@@ -17,22 +17,10 @@
 // delete or mark the next line as comment if you don't need these
 #define REALTIMECLOCK    // enable real time clock
 
-// When in calibration mode, adjust the following factor until the servos move exactly 90 degrees
-#define SERVOFAKTORLEFT 500
-#define SERVOFAKTORRIGHT 600
-
-// Zero-position of left and right servo
-// When in calibration mode, adjust the NULL-values so that the servo arms are at all times parallel
-// either to the X or Y axis
-#define SERVOLEFTNULL 1550
-#define SERVORIGHTNULL 950
-
 #define SERVOPINLIFT  2
 #define SERVOPINLEFT  3
 #define SERVOPINRIGHT 4
 
-
-#define WIPE 111
 #define COLON 11
 
 // lift positions of lifting servo
@@ -48,12 +36,6 @@
 #define L2 45
 #define L3 15
 
-// origin points of left and right servo
-#define O1X 32
-#define O1Y -22.5
-#define O2X 59
-#define O2Y -22.5
-
 #define WIPER_X 75
 #define WIPER_Y 40
 
@@ -62,15 +44,8 @@
 #include <TimeLib.h>
 #include <Servo.h>
 
-#ifdef REALTIMECLOCK
-// for instructions on how to hook up a real time clock,
-// see here -> http://www.pjrc.com/teensy/td_libs_DS1307RTC.html
-// DS1307RTC works with the DS1307, DS1337 and DS3231 real time clock chips.
-// Please run the SetTime example to initialize the time on new RTC chips and begin running.
-
 #include <Wire.h>
 #include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time    
-#endif
 
 Servo servo1;  //
 Servo servo2;  //
@@ -87,37 +62,14 @@ volatile double lastY = WIPER_Y;
 #include <SerialUI.h>
 SUI::SerialUI mySUI;
 
-void setup()
-{
-#ifdef REALTIMECLOCK
-  //Serial.begin(9600);
-  //while (!Serial) { ; } // wait for serial port to connect. Needed for Leonardo only
-
-  // Set current time only the first to values, hh,mm are needed
+void setup() {
   tmElements_t tm;
-  if (RTC.read(tm))
-  {
+  if (RTC.read(tm)) {
     setTime(tm.Hour, tm.Minute, tm.Second, tm.Day, tm.Month, tm.Year);
-    //Serial.println("DS1307 time is set OK.");
   }
-  else
-  {
-    if (RTC.chipPresent())
-    {
-      //Serial.println("DS1307 is stopped.  Please run the SetTime example to initialize the time and begin running.");
-    }
-    else
-    {
-      //Serial.println("DS1307 read error!  Please check the circuitry.");
-    }
-    // Set current time only the first to values, hh,mm are needed
+  else {
     setTime(19, 38, 0, 0, 0, 0);
   }
-#else
-  // Set current time only the first to values, hh,mm are needed
-  setTime(19, 38, 0, 0, 0, 0);
-#endif
-
 
   servo1.attach(SERVOPINLIFT);  //  lifting servo
   lift(2);

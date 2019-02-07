@@ -586,40 +586,6 @@ void calculate_angles(double x, double y) {
   servo3.writeMicroseconds(1250+636*theta5);
 }
 
-void set_XY(double Tx, double Ty)
-{
-  delay(1);
-  double dx, dy, c, a1, a2, Hx, Hy;
-
-  // calculate triangle between pen, servoLeft and arm joint
-  // cartesian dx/dy
-  dx = Tx - O1X;
-  dy = Ty - O1Y;
-
-  // polar lemgth (c) and angle (a1)
-  c = sqrt(dx * dx + dy * dy); //
-  a1 = atan2(dy, dx); //
-  a2 = return_angle(L1, L2, c);
-
-  servo2.writeMicroseconds(floor(((a2 + a1 - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
-
-  // calculate joinr arm point for triangle of the right servo arm
-  a2 = return_angle(L2, L1, c);
-  Hx = Tx + L3 * cos((a1 - a2 + 0.621) + M_PI); //36,5°
-  Hy = Ty + L3 * sin((a1 - a2 + 0.621) + M_PI);
-
-  // calculate triangle between pen joint, servoRight and arm joint
-  dx = Hx - O2X;
-  dy = Hy - O2Y;
-
-  c = sqrt(dx * dx + dy * dy);
-  a1 = atan2(dy, dx);
-  a2 = return_angle(L1, (L2 - L3), c);
-
-  servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
-
-}
-
 void calculate_calibration_coordinates() {
   double p2x = O1X;
   double p2y = O1Y + L1;

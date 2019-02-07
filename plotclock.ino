@@ -73,8 +73,6 @@
 #include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time    
 #endif
 
-int servoLift = 1500;
-
 Servo servo1;  //
 Servo servo2;  //
 Servo servo3;  //
@@ -419,71 +417,16 @@ void number(float bx, float by, int num, float scale) {
 }
 
 
-
+int servoLift = 1500; // make this local
 void lift(char lift) {
-  switch (lift) {
-    // room to optimize  !
+  int lifts[3] = { LIFT0, LIFT1, LIFT2 };
 
-    case 0: //850
-
-      if (servoLift >= LIFT0) {
-        while (servoLift >= LIFT0)
-        {
-          servoLift--;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-        }
-      }
-      else {
-        while (servoLift <= LIFT0) {
-          servoLift++;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-
-        }
-
-      }
-
-      break;
-
-    case 1: //150
-
-      if (servoLift >= LIFT1) {
-        while (servoLift >= LIFT1) {
-          servoLift--;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-
-        }
-      }
-      else {
-        while (servoLift <= LIFT1) {
-          servoLift++;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-        }
-
-      }
-
-      break;
-
-    case 2:
-
-      if (servoLift >= LIFT2) {
-        while (servoLift >= LIFT2) {
-          servoLift--;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-        }
-      }
-      else {
-        while (servoLift <= LIFT2) {
-          servoLift++;
-          servo1.writeMicroseconds(servoLift);
-          delayMicroseconds(LIFTSPEED);
-        }
-      }
-      break;
+  int difference = lifts[lift] - servoLift;
+  int direction = difference / abs(difference);
+  while(servoLift != lifts[lift]) {
+    servoLift += direction;
+    servo1.writeMicroseconds(servoLift);
+    delayMicroseconds(LIFTSPEED);
   }
 }
 

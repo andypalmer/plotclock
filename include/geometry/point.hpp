@@ -7,4 +7,5 @@ class Point {
   Point(double, double);
   double x();
   double y();
+  double distance_to(Point);
 };

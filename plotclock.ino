@@ -187,6 +187,16 @@ void test_loop() {
       mySUI.handleRequests();
     }
   }
+  redraw_time_if_necessary();
+}
+
+void redraw_time_if_necessary() {
+  static int last_minute = 99;
+  if (last_minute == minute()) { return; }
+
+  last_minute = minute();
+  wipe();
+  writeTime();
 }
 
 void dots() {

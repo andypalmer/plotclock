@@ -45,7 +45,10 @@
 #include <Servo.h>
 
 #include <Wire.h>
-#include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time    
+#include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time   
+
+#include "include/geometry/point.hpp"
+Point point = Point(3,5);
 
 Servo servo1;  //
 Servo servo2;  //

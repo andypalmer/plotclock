@@ -1,5 +1,5 @@
 #include "point.hpp"
-#include <cmath>
+#include "math.h"
 
 Point::Point(double x, double y): _x(x), _y(y) {}
 double Point::x() { return _x; }

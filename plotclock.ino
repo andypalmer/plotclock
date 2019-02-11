@@ -4,10 +4,6 @@
 // units: mm; microseconds; radians
 // origin: bottom left of drawing surface
 
-#define SERVOPINLIFT  2
-#define SERVOPINLEFT  3
-#define SERVOPINRIGHT 4
-
 #define COLON 11
 
 // lift positions of lifting servo
@@ -26,24 +22,19 @@
 #define WIPER_X 75
 #define WIPER_Y 40
 
-
 #include <Time.h> // see http://playground.arduino.cc/Code/time 
 #include <TimeLib.h>
-#include <Servo.h>
-
 #include <Wire.h>
 #include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time   
 
-#include "include/geometry/point.hpp"
-Point point = Point(3,5);
-
-Servo servo1;  //
-Servo servo2;  //
-Servo servo3;  //
+#include <Servo.h>
+#define SERVOPINLIFT  2
+#define SERVOPINLEFT  3
+#define SERVOPINRIGHT 4
+Servo servo1, servo2, servo3;
 
 volatile double lastX = WIPER_X;
 volatile double lastY = WIPER_Y;
-
 
 #include <SerialUI.h>
 SUI::SerialUI mySUI;
@@ -71,8 +62,7 @@ void loop() {
   test_loop();
 }
 
-void setupMenu()
-{
+void setupMenu() {
   mySUI.setGreeting(F("+++ Welcome to Plot Clock +++\r\nEnter ? for help."));
   mySUI.begin(115200);
   mySUI.setTimeout(20000);      // timeout for reads (in ms), same as for Serial.
@@ -122,18 +112,15 @@ void servoRight() {
   servo3.writeMicroseconds(x);
 }
 
-void showTime()
-{
+void showTime(){
   tmElements_t tm;
-  if (RTC.read(tm))
-  {
+  if (RTC.read(tm)) {
     mySUI.print(F("The time is: "));
     mySUI.print(tm.Hour);
     mySUI.print(F(":"));
     mySUI.println(tm.Minute);
   }
 }
-
 
 void wipe() {
   lift(2);
@@ -212,23 +199,22 @@ void draw_time(int hour, int minute) {
 // The structure follows this principle: move to first startpoint of the numeral, lift down, draw numeral, lift up
 // ANDY: the curve functions are called with doubles, but the method takes ints, so we're losing precision
 void number(float bx, float by, int num, float scale) {
-
   switch (num) {
-
     case 0:
       drawTo(bx + 12 * scale, by + 6 * scale);
       lift(0);
       bogenGZS(bx + 7 * scale, by + 10 * scale, 10 * scale, -0.8, 6.7, 0.5);
       lift(1);
       break;
+      
     case 1:
-
       drawTo(bx + 3 * scale, by + 15 * scale);
       lift(0);
       drawTo(bx + 10 * scale, by + 20 * scale);
       drawTo(bx + 10 * scale, by + 0 * scale);
       lift(1);
       break;
+      
     case 2:
       drawTo(bx + 2 * scale, by + 12 * scale);
       lift(0);
@@ -237,6 +223,7 @@ void number(float bx, float by, int num, float scale) {
       drawTo(bx + 12 * scale, by + 0 * scale);
       lift(1);
       break;
+      
     case 3:
       drawTo(bx + 2 * scale, by + 17 * scale);
       lift(0);
@@ -244,6 +231,7 @@ void number(float bx, float by, int num, float scale) {
       bogenUZS(bx + 5 * scale, by + 5 * scale, 5 * scale, 1.57, -3, 1);
       lift(1);
       break;
+      
     case 4:
       drawTo(bx + 10 * scale, by + 0 * scale);
       lift(0);
@@ -252,6 +240,7 @@ void number(float bx, float by, int num, float scale) {
       drawTo(bx + 12 * scale, by + 6 * scale);
       lift(1);
       break;
+      
     case 5:
       drawTo(bx + 2 * scale, by + 5 * scale);
       lift(0);
@@ -260,6 +249,7 @@ void number(float bx, float by, int num, float scale) {
       drawTo(bx + 12 * scale, by + 20 * scale);
       lift(1);
       break;
+      
     case 6:
       drawTo(bx + 2 * scale, by + 10 * scale);
       lift(0);
@@ -267,6 +257,7 @@ void number(float bx, float by, int num, float scale) {
       drawTo(bx + 11 * scale, by + 20 * scale);
       lift(1);
       break;
+      
     case 7:
       drawTo(bx + 2 * scale, by + 20 * scale);
       lift(0);
@@ -274,6 +265,7 @@ void number(float bx, float by, int num, float scale) {
       drawTo(bx + 2 * scale, by + 0);
       lift(1);
       break;
+      
     case 8:
       drawTo(bx + 5 * scale, by + 10 * scale);
       lift(0);
@@ -300,13 +292,11 @@ void number(float bx, float by, int num, float scale) {
       bogenGZS(bx + 5 * scale, by + 5 * scale, 0.1 * scale, 1, -1, 1);
       lift(1);
       break;
-
   }
 }
 
-
-int servoLift = 1500; // make this local
 void lift(char lift) {
+  static int servoLift = 1500;
   int lifts[3] = { LIFT0, LIFT1, LIFT2 };
 
   int difference = lifts[lift] - servoLift;
@@ -318,7 +308,6 @@ void lift(char lift) {
   }
 }
 
-
 void bogenUZS(float bx, float by, float radius, double start, double ende, float sqee) {
   // start = start angle, ende = end angle (from horizontal)
   // sqee = 1 for everything except the 0... compresses the x direction to create an ellipse
@@ -326,12 +315,9 @@ void bogenUZS(float bx, float by, float radius, double start, double ende, float
   float count = 0;
 
   do {
-    drawTo(sqee * radius * cos(start + count) + bx,
-           radius * sin(start + count) + by);
+    drawTo(sqee * radius * cos(start + count) + bx, radius * sin(start + count) + by);
     count += inkr;
-  }
-  while ((start + count) > ende);
-
+  } while ((start + count) > ende);
 }
 
 void bogenGZS(float bx, float by, float radius, double start, double ende, float sqee) {
@@ -339,13 +325,10 @@ void bogenGZS(float bx, float by, float radius, double start, double ende, float
   float count = 0;
 
   do {
-    drawTo(sqee * radius * cos(start + count) + bx,
-           radius * sin(start + count) + by);
+    drawTo(sqee * radius * cos(start + count) + bx, radius * sin(start + count) + by);
     count += inkr;
-  }
-  while ((start + count) <= ende);
+  } while ((start + count) <= ende);
 }
-
 
 void drawTo(double pX, double pY) {
   double dx, dy, c;
@@ -375,7 +358,6 @@ double return_angle(double a, double b, double c) {
 }
 
 void calculate_angles(double x, double y) {
-
   double p1x = 30;
   double p1y = -25;
   double p5x = 55;

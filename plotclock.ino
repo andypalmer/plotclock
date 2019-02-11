@@ -1,21 +1,8 @@
 // Plotclock
 // cc - by Johannes Heberlein 2014
-// v 1.02
 // thingiverse.com/joo   wiki.fablab-nuernberg.de
 // units: mm; microseconds; radians
 // origin: bottom left of drawing surface
-// time library see http://playground.arduino.cc/Code/time
-// RTC  library see http://playground.arduino.cc/Code/time
-//               or http://www.pjrc.com/teensy/td_libs_DS1307RTC.html
-// Change log:
-// 1.01  Release by joo at https://github.com/9a/plotclock
-// 1.02  Additional features implemented by Dave:
-//       - added ability to calibrate servofaktor seperately for left and right servos
-//       - added code to support DS1307, DS1337 and DS3231 real time clock chips
-//       - see http://www.pjrc.com/teensy/td_libs_DS1307RTC.html for how to hook up the real time clock
-
-// delete or mark the next line as comment if you don't need these
-#define REALTIMECLOCK    // enable real time clock
 
 #define SERVOPINLIFT  2
 #define SERVOPINLEFT  3
@@ -53,10 +40,6 @@ Point point = Point(3,5);
 Servo servo1;  //
 Servo servo2;  //
 Servo servo3;  //
-
-
-int last_min = 0;
-
 
 volatile double lastX = WIPER_X;
 volatile double lastY = WIPER_Y;
@@ -175,7 +158,7 @@ void rest() {
 }
 
 void colon() {
-  number(28, 25, 11, 0.9);
+  number(28, 25, COLON, 0.9);
 }
 
 void test_loop() {
@@ -223,45 +206,6 @@ void draw_time(int hour, int minute) {
     number(48, 25, minute % 10, 0.9);
     
     rest();
-}
-
-void original_loop() {
-  int i = 0;
-  if (last_min != minute()) {
-
-    if (!servo1.attached()) servo1.attach(SERVOPINLIFT);
-    if (!servo2.attached()) servo2.attach(SERVOPINLEFT);
-    if (!servo3.attached()) servo3.attach(SERVOPINRIGHT);
-
-    lift(0);
-
-    hour();
-    while ((i + 1) * 10 <= hour())
-    {
-      i++;
-    }
-
-    wipe();
-    number(5, 25, i, 0.9);
-    number(19, 25, (hour() - i * 10), 0.9);
-    colon();
-
-    i = 0;
-    while ((i + 1) * 10 <= minute())
-    {
-      i++;
-    }
-    number(34, 25, i, 0.9);
-    number(48, 25, (minute() - i * 10), 0.9);
-    lift(2);
-    drawTo(WIPER_X, WIPER_Y);
-    lift(1);
-    last_min = minute();
-
-    servo1.detach();
-    servo2.detach();
-    servo3.detach();
-  }
 }
 
 // Writing numeral with bx by being the bottom left originpoint. Scale 1 equals a 20 mm high font.
@@ -375,7 +319,7 @@ void lift(char lift) {
 }
 
 
-void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee) {
+void bogenUZS(float bx, float by, float radius, double start, double ende, float sqee) {
   // start = start angle, ende = end angle (from horizontal)
   // sqee = 1 for everything except the 0... compresses the x direction to create an ellipse
   float inkr = -0.05; // increment in radians
@@ -390,7 +334,7 @@ void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee)
 
 }
 
-void bogenGZS(float bx, float by, float radius, int start, int ende, float sqee) {
+void bogenGZS(float bx, float by, float radius, double start, double ende, float sqee) {
   float inkr = 0.05;
   float count = 0;
 

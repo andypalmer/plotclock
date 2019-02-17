@@ -40,13 +40,8 @@ volatile double lastY = WIPER_Y;
 SUI::SerialUI mySUI;
 
 void setup() {
-  tmElements_t tm;
-  if (RTC.read(tm)) {
-    setTime(tm.Hour, tm.Minute, tm.Second, tm.Day, tm.Month, tm.Year);
-  }
-  else {
-    setTime(19, 38, 0, 0, 0, 0);
-  }
+  setTime(19, 38, 0, 0, 0, 0);
+  setSyncProvider(RTC.get);
 
   servo1.attach(SERVOPINLIFT);  //  lifting servo
   lift(2);

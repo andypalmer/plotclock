@@ -78,10 +78,19 @@ void setupMenu() {
   mainMenu->addCommand(SUI_STR("write"), writeTime, SUI_STR("write the time"));
   mainMenu->addCommand(SUI_STR("rest"), rest, SUI_STR("rest the pen in the wiper"));
   mainMenu->addCommand(SUI_STR("dots"), dots, SUI_STR("draw calibration dots"));
+  mainMenu->addCommand(SUI_STR("lift"), _lift, SUI_STR("lift/lower the pen"));
 }
 
 void writeTime() {
   draw_time(hour(),minute());
+}
+
+void _lift() {
+  mySUI.print(F("Lift value: "));
+  mySUI.showEnterNumericDataPrompt();
+  int x = mySUI.parseInt();
+  mySUI.println(x);
+  lift(x);
 }
 
 void move() {
@@ -93,7 +102,7 @@ void move() {
   mySUI.showEnterNumericDataPrompt();
   int y = mySUI.parseInt();
   mySUI.println(y);
-  calculate_angles(x, y);
+  drawTo(x, y);
 }
 
 void servoLeft() {
@@ -157,7 +166,7 @@ void test_loop() {
       mySUI.handleRequests();
     }
   }
-  redraw_time_if_necessary();
+//  redraw_time_if_necessary();
 }
 
 void redraw_time_if_necessary() {
@@ -295,7 +304,7 @@ void number(float bx, float by, int num, float scale) {
   }
 }
 
-void lift(char lift) {
+void lift(int lift) {
   static int servoLift = 1500;
   int lifts[3] = { LIFT0, LIFT1, LIFT2 };
 
@@ -345,7 +354,6 @@ void drawTo(double pX, double pY) {
   for (i = 0; i <= c; i++) {
     // draw line point by point
     calculate_angles(lastX + (i * dx / c), lastY + (i * dy / c));
-
   }
 
   lastX = pX;
@@ -368,88 +376,88 @@ void calculate_angles(double x, double y) {
   double dx6 = L3 * cos(0.621);
   double dy6 = L3 * sin(0.621);
   double length46 = sqrt((L2 + dx6) * (L2 + dx6) + dy6 * dy6);
-  //mySUI.print("length46: ");
-  //mySUI.println(length46);
+  mySUI.print("length46: ");
+  mySUI.println(length46);
   double theta346 = atan(dy6/(L2 + dx6));
-  //mySUI.print("theta346: ");
-  //mySUI.println(theta346);
+  mySUI.print("theta346: ");
+  mySUI.println(theta346);
 
   // calculate distance between P5 and P6
   double length56 = sqrt((x - p5x) * (x - p5x) + (y - p5y) * (y - p5y));
-  //mySUI.print("length56: ");
-  //mySUI.println(length56);
+  mySUI.print("length56: ");
+  mySUI.println(length56);
 
   // calculate angle between origin, P5, and P6
   double alpha5 = atan((y - p5y) / (p5x - x));
-  //mySUI.print("alpha5: ");
-  //mySUI.println(alpha5);
+  mySUI.print("alpha5: ");
+  mySUI.println(alpha5);
 
   //calculate angle between P6, P5, and P4
   double beta5 = return_angle(L1, length46, length56);
-  //mySUI.print("beta5: ");
-  //mySUI.println(beta5);
+  mySUI.print("beta5: ");
+  mySUI.println(beta5);
 
   //calculate angle between x axis, P5, and P4
   double theta5 = M_PI - alpha5 - beta5;
   if(x > p5x) { theta5 -= M_PI; }
-  //mySUI.print("theta5: ");
-  //mySUI.println(theta5);
+  mySUI.print("theta5: ");
+  mySUI.println(theta5);
 
   //calculate location of P4 (polar / vector from P5)
   double p4x = L1 * cos(theta5) + p5x;
   double p4y = L1 * sin(theta5) + p5y;
 
-  //mySUI.print("p4: ");
-  //mySUI.print(p4x);
-  //mySUI.print(", ");
-  //mySUI.println(p4y);
+  mySUI.print("p4: ");
+  mySUI.print(p4x);
+  mySUI.print(", ");
+  mySUI.println(p4y);
 
   //calculate angle between x-axis, P4, and P6
   double thetax46 = atan((y-p4y) / (p4x-x));
-  //mySUI.print("thetax46: ");
-  //mySUI.println(thetax46); 
+  mySUI.print("thetax46: ");
+  mySUI.println(thetax46); 
   
   //calculate angle between x-axis, P4 and P3
   double theta043 = thetax46-theta346;
-  //mySUI.print("theta043: ");
-  //mySUI.println(theta043);
+  mySUI.print("theta043: ");
+  mySUI.println(theta043);
 
   //calculate position of P3 (polar / vector from P4)
   double p3x = p4x - L2 * cos(theta043);
   double p3y = p4y + L2 * sin(theta043);
 
-  //mySUI.print("p3: ");
-  //mySUI.print(p3x);
-  //mySUI.print(", ");
-  //mySUI.println(p3y);
+  mySUI.print("p3: ");
+  mySUI.print(p3x);
+  mySUI.print(", ");
+  mySUI.println(p3y);
 
   // calculate distance between P1 and P3
   double length13 = sqrt((p1x - p3x) * (p1x - p3x) + (p1y - p3y) * (p1y - p3y));
-  //mySUI.print("length13: ");
-  //mySUI.println(length13);
+  mySUI.print("length13: ");
+  mySUI.println(length13);
 
   // calculate angle between x-axis, P1, and P3
   double alpha1 = atan(((p3y - p1y) / (p1x - p3x)));
-  //mySUI.print("alpha1: ");
-  //mySUI.println(alpha1);
+  mySUI.print("alpha1: ");
+  mySUI.println(alpha1);
 
   // calculate angle between P2, P1, and P3
   double beta1 = return_angle(L1, L2, length13);
-  //mySUI.println(beta1);
+  mySUI.println(beta1);
 
   //calculate angle between P1, x-axis, and P2
   double theta1 = alpha1 - beta1;
   if(p3x > p1x) { theta1 += M_PI; }
-  //mySUI.print("theta1: ");
-  //mySUI.println(theta1);
+  mySUI.print("theta1: ");
+  mySUI.println(theta1);
 
   //position of P2
   double p2x = p1x - L1 * cos(theta1);
   double p2y = p1y + L1 * sin(theta1);
-  //mySUI.print("p2: ");
-  //mySUI.print(p2x);
-  //mySUI.print(", ");
-  //mySUI.println(p2y);
+  mySUI.print("p2: ");
+  mySUI.print(p2x);
+  mySUI.print(", ");
+  mySUI.println(p2y);
 
   servo2.writeMicroseconds(1450-541*theta1);
   servo3.writeMicroseconds(1250+636*theta5);
